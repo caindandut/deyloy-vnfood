@@ -133,6 +133,27 @@
   background: linear-gradient(135deg, #ffb347, #ff6b2c) !important;
   color: #fff !important;
   box-shadow: 0 15px 35px rgba(255, 107, 44, 0.25);
+  white-space: nowrap !important;
+}
+
+.warm-video-btn,
+.warm-video-btn *,
+.warm-video-btn span {
+  white-space: nowrap !important;
+}
+
+/* Ensure text doesn't wrap in modals */
+.modal .warm-video-btn,
+.modal .warm-video-btn *,
+.modal .warm-video-btn span {
+  white-space: nowrap !important;
+  flex-wrap: nowrap !important;
+}
+
+.modal .warm-video-btn {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
 .warm-video-btn:hover {
@@ -1403,6 +1424,30 @@ body.modal-open {
   .video-cta-btn {
     min-width: auto;
     width: 100%;
+  }
+
+  .warm-video-btn {
+    white-space: nowrap !important;
+    font-size: clamp(0.85rem, 2.5vw, 1rem) !important;
+  }
+
+  .warm-video-btn span {
+    white-space: nowrap !important;
+  }
+
+  /* Modal video button - ensure no wrapping */
+  .modal .warm-video-btn {
+    white-space: nowrap !important;
+    font-size: clamp(0.75rem, 2vw, 0.9rem) !important;
+    padding: 0.7rem 0.9rem !important;
+  }
+
+  .modal .warm-video-btn span {
+    white-space: nowrap !important;
+  }
+
+  .modal .warm-video-btn span:first-child {
+    flex-shrink: 0;
   }
 }
 

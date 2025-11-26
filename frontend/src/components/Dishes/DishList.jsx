@@ -110,18 +110,18 @@ const DishList = ({ onNavigate }) => {
   return (
     <>
       <Row className="g-0" style={{ margin: 0 }}>
-        <Col xs={12} md={3} lg={2} style={{ padding: 0 }}>
+        <Col xs={12} md={12} lg={2} style={{ padding: 0 }} className="d-none d-lg-block">
           <Sidebar activeTab="dishes" onTabChange={handleSidebarNavigation} />
         </Col>
-        <Col xs={12} md={9} lg={10} className="px-0">
+        <Col xs={12} md={12} lg={10} className="px-0 px-lg-3">
           <section className={`dishes-section ${darkMode ? 'dishes-section-dark' : ''}`}>
             <div className="dishes-section-inner">
               <header className={`dishes-header ${darkMode ? 'dishes-header-dark' : ''}`}>
                 <div className="dishes-heading-group">
-                  <h2 className={`display-5 fw-bold mb-3 ${darkMode ? 'text-white' : 'text-dark'}`}>
+                  <h2 className={`display-5 fw-bold mb-2 mb-md-3 ${darkMode ? 'text-white' : 'text-dark'}`}>
                     {t('dishesTitle') || 'Khám phá món ăn phổ biến Việt Nam với 25 món ăn'}
                   </h2>
-                  <p className={`fs-5 ${darkMode ? 'text-light' : 'text-muted'}`}>
+                  <p className={`fs-5 ${darkMode ? 'text-light' : 'text-muted'}`} style={{ fontSize: 'clamp(0.9rem, 2.5vw, 1.25rem)' }}>
                     {t('dishesDescription') || 'Hệ thống AI có thể nhận diện được 25 món ăn truyền thống Việt Nam. Khám phá công thức chi tiết, nguyên liệu và hướng dẫn từng bước cho từng món ăn!'}
                   </p>
                 </div>
@@ -130,16 +130,16 @@ const DishList = ({ onNavigate }) => {
               <Card
                 className={`dishes-content-card shadow-sm ${darkMode ? 'bg-dark text-light border-secondary' : 'bg-white border-0'}`}
               >
-                <Card.Body className="p-4 p-md-5">
-                  <div className="dishes-toolbar mb-4">
+                <Card.Body className="p-3 p-md-4 p-lg-5">
+                  <div className="dishes-toolbar mb-3 mb-md-4">
                     <Form.Group className="flex-grow-1">
                       <Form.Control
                         type="text"
                         placeholder={t('searchDishes') || 'Tìm kiếm món ăn...'}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className={`rounded-pill px-4 py-3 ${darkMode ? 'bg-dark text-light border-secondary' : 'bg-white border'}`}
-                        style={{ fontSize: '1rem' }}
+                        className={`rounded-pill px-3 px-md-4 py-2 py-md-3 ${darkMode ? 'bg-dark text-light border-secondary' : 'bg-white border'}`}
+                        style={{ fontSize: 'clamp(0.9rem, 2.5vw, 1rem)' }}
                       />
                     </Form.Group>
                     <div className="dishes-toolbar-meta">
@@ -182,7 +182,7 @@ const DishList = ({ onNavigate }) => {
 
                   {!loading && !error && dishes.length > 0 && (
                     <>
-                      <Row className="g-4">
+                      <Row className="g-3 g-md-4">
                         {dishes.map((dish) => (
                           <Col key={dish.id} xs={12} sm={6} md={4} lg={3}>
                             <DishCard dish={dish} onClick={() => handleDishClick(dish)} />

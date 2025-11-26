@@ -24,8 +24,8 @@ const WebcamTab = ({
   ];
 
   return (
-    <Row className="g-4 webcam-layout">
-      <Col lg={8}>
+    <Row className="g-3 g-md-4 webcam-layout">
+      <Col xs={12} lg={8}>
         <div
           className={`webcam-feed-wrapper ${darkMode ? 'dark' : ''}`}
         >
@@ -45,7 +45,7 @@ const WebcamTab = ({
               rounded
               crossOrigin="anonymous"
               className={`w-100 img-contain ${capturedImagePreview ? 'd-none' : 'd-block'}`}
-              style={{ maxHeight: '480px' }}
+              style={{ maxHeight: 'clamp(250px, 50vh, 480px)' }}
               onError={(e) => {
                 e.target.style.display = 'none';
                 setError('Không thể tải video stream. Kiểm tra kết nối và webcam trên Pi.');
@@ -70,22 +70,22 @@ const WebcamTab = ({
               fluid
               rounded
               className="w-100 img-contain rounded-4"
-              style={{ maxHeight: '480px' }}
+              style={{ maxHeight: 'clamp(250px, 50vh, 480px)' }}
             />
           )}
           <canvas ref={canvasRef} className="d-none" />
         </div>
       </Col>
 
-      <Col lg={4}>
+      <Col xs={12} lg={4}>
         <Card className={`webcam-sidecard h-100 ${darkMode ? 'bg-dark text-light border-secondary' : 'bg-white'}`}>
-          <Card.Body className="d-flex flex-column h-100">
+          <Card.Body className="d-flex flex-column h-100 p-3 p-md-4">
             <div className="d-flex align-items-center justify-content-between mb-3">
-              <div>
+              <div className="flex-grow-1">
                 <p className="text-uppercase small fw-semibold text-muted mb-1">
                   {t('cameraStatus') || 'Trạng thái'}
                 </p>
-                <h5 className="mb-0">
+                <h5 className="mb-0" style={{ fontSize: 'clamp(0.95rem, 2.5vw, 1.25rem)' }}>
                   {streamError
                     ? (t('cameraOffline') || 'Không thấy tín hiệu camera')
                     : capturedImagePreview
@@ -97,7 +97,7 @@ const WebcamTab = ({
             </div>
 
             {capturedImagePreview && (
-              <div className="mb-4">
+              <div className="mb-3 mb-md-4">
                 <Image
                   src={capturedImagePreview}
                   alt="Captured thumbnail"
@@ -108,7 +108,7 @@ const WebcamTab = ({
               </div>
             )}
 
-            <div className="d-grid gap-2 mb-4">
+            <div className="d-grid gap-2 mb-3 mb-md-4">
               {streamError ? (
                 <Button variant="outline-danger" disabled className="rounded-4 py-2 fw-semibold">
                   {t('cameraOffline') || 'Không thấy tín hiệu camera'}
@@ -157,7 +157,7 @@ const WebcamTab = ({
               </p>
               <ul className="webcam-tip-list">
                 {tips.map((tip, index) => (
-                  <li key={`webcam-tip-${index}`}>{tip}</li>
+                  <li key={`webcam-tip-${index}`} style={{ fontSize: 'clamp(0.85rem, 2vw, 0.95rem)' }}>{tip}</li>
                 ))}
               </ul>
             </div>

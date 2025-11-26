@@ -21,11 +21,11 @@ const DishCard = ({ dish, onClick }) => {
         alt={dish.name}
         className="img-cover"
         style={{
-          height: '220px'
+          height: 'clamp(180px, 30vw, 220px)'
         }}
       />
-      <Card.Body className="p-4">
-        <Card.Title className="fs-5 fw-semibold mb-0">
+      <Card.Body className="p-3 p-md-4">
+        <Card.Title className="fs-5 fw-semibold mb-0" style={{ fontSize: 'clamp(0.95rem, 2.5vw, 1.25rem)' }}>
           {dish.name}
         </Card.Title>
       </Card.Body>

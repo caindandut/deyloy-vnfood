@@ -56,24 +56,24 @@ const LoginForm = ({ onNavigate }) => {
 
   return (
     <Card className={`shadow-sm ${darkMode ? 'bg-dark text-light border-secondary' : ''}`} style={{ border: 'none', borderRadius: '12px' }}>
-      <Card.Header className={`text-center border-0 pt-4 pb-2 ${darkMode ? 'bg-dark' : 'bg-white'}`}>
-        <h3 className="mb-0" style={{ fontWeight: '600', color: darkMode ? '#fff' : '#333' }}>{t('loginTitle')}</h3>
+      <Card.Header className={`text-center border-0 pt-3 pt-md-4 pb-2 ${darkMode ? 'bg-dark' : 'bg-white'}`}>
+        <h3 className="mb-0" style={{ fontWeight: '600', color: darkMode ? '#fff' : '#333', fontSize: 'clamp(1.25rem, 4vw, 1.75rem)' }}>{t('loginTitle')}</h3>
       </Card.Header>
-      <Card.Body className="px-4 pb-4">
+      <Card.Body className="px-3 px-md-4 pb-3 pb-md-4">
         <Form onSubmit={handleSubmit}>
           <Form.Group className="mb-3">
-            <Form.Label style={{ fontWeight: '500', fontSize: '0.9rem', color: darkMode ? '#ccc' : '#555' }}>{t('username')}</Form.Label>
+            <Form.Label style={{ fontWeight: '500', fontSize: 'clamp(0.85rem, 2.5vw, 0.9rem)', color: darkMode ? '#ccc' : '#555' }}>{t('username')}</Form.Label>
             <Form.Control
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
               className={darkMode ? 'bg-dark text-light border-secondary' : ''}
-              style={{ borderRadius: '8px', padding: '10px 12px', border: darkMode ? '1.5px solid #555' : '1.5px solid #ddd' }}
+              style={{ borderRadius: '8px', padding: 'clamp(0.75rem, 2vw, 0.875rem) clamp(0.875rem, 2.5vw, 1rem)', border: darkMode ? '1.5px solid #555' : '1.5px solid #ddd', fontSize: 'clamp(0.9rem, 2.5vw, 1rem)' }}
             />
           </Form.Group>
-          <Form.Group className="mb-4">
-            <Form.Label style={{ fontWeight: '500', fontSize: '0.9rem', color: darkMode ? '#ccc' : '#555' }}>{t('password')}</Form.Label>
+          <Form.Group className="mb-3 mb-md-4">
+            <Form.Label style={{ fontWeight: '500', fontSize: 'clamp(0.85rem, 2.5vw, 0.9rem)', color: darkMode ? '#ccc' : '#555' }}>{t('password')}</Form.Label>
             <div className="password-field-wrapper">
               <Form.Control
                 type={showPassword ? 'text' : 'password'}
@@ -81,7 +81,7 @@ const LoginForm = ({ onNavigate }) => {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 className={darkMode ? 'bg-dark text-light border-secondary' : ''}
-                style={{ borderRadius: '8px', padding: '10px 12px', border: darkMode ? '1.5px solid #555' : '1.5px solid #ddd' }}
+                style={{ borderRadius: '8px', padding: 'clamp(0.75rem, 2vw, 0.875rem) clamp(0.875rem, 2.5vw, 1rem)', border: darkMode ? '1.5px solid #555' : '1.5px solid #ddd', fontSize: 'clamp(0.9rem, 2.5vw, 1rem)' }}
               />
               <button
                 type="button"
@@ -93,32 +93,32 @@ const LoginForm = ({ onNavigate }) => {
               </button>
             </div>
           </Form.Group>
-          <div className="d-flex gap-2 mb-3">
+          <div className="d-flex flex-column flex-sm-row gap-2 mb-3">
             <Button
               variant="primary"
               type="submit"
               disabled={loading}
               className="flex-fill auth-primary-btn"
-              style={{ borderRadius: '8px', padding: '10px', fontWeight: '500' }}
+              style={{ borderRadius: '8px', padding: 'clamp(0.75rem, 2vw, 0.875rem) 1rem', fontWeight: '500', fontSize: 'clamp(0.9rem, 2.5vw, 1rem)' }}
             >
               {loading ? <Spinner as="span" size="sm" /> : t('login')}
             </Button>
             <Button
               variant="outline-secondary"
               onClick={() => onNavigate('main')}
-              style={{ borderRadius: '8px', padding: '10px', fontWeight: '500' }}
+              style={{ borderRadius: '8px', padding: 'clamp(0.75rem, 2vw, 0.875rem) 1rem', fontWeight: '500', fontSize: 'clamp(0.9rem, 2.5vw, 1rem)' }}
             >
               {t('back')}
             </Button>
           </div>
           <div className="text-center">
-            <p className={`mb-0 ${darkMode ? 'text-light' : 'text-muted'}`} style={{ fontSize: '0.9rem', opacity: darkMode ? 0.8 : 1, display: 'inline-flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap', justifyContent: 'center' }}>
+            <p className={`mb-0 ${darkMode ? 'text-light' : 'text-muted'}`} style={{ fontSize: 'clamp(0.8rem, 2.5vw, 0.9rem)', opacity: darkMode ? 0.8 : 1, display: 'inline-flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap', justifyContent: 'center' }}>
               <span>{t('noAccount')}</span>
               <Button
                 variant="link"
                 className="p-0 text-decoration-none"
                 onClick={() => onNavigate('register')}
-                style={{ fontWeight: '500', color: darkMode ? '#6c9eff' : undefined, fontSize: '0.9rem', padding: 0, lineHeight: '1.5' }}
+                style={{ fontWeight: '500', color: darkMode ? '#6c9eff' : undefined, fontSize: 'clamp(0.8rem, 2.5vw, 0.9rem)', padding: 0, lineHeight: '1.5' }}
               >
                 {t('registerNow')}
               </Button>

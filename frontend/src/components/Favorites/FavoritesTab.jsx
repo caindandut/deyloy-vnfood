@@ -76,26 +76,30 @@ const FavoritesTab = ({ favorites, loading, onItemClick, onRemoveFavorite }) => 
                   className={`shadow-sm ${darkMode ? 'bg-dark text-light border-secondary' : 'bg-white border-0'}`}
                   style={{ borderRadius: '1rem' }}
                 >
-                  <Card.Body className="p-4">
-                    <div className="d-flex align-items-center gap-4">
+                  <Card.Body className="p-3 p-md-4">
+                    <div className="d-flex align-items-center gap-3 gap-md-4 flex-nowrap">
                       <Image
                         src={item.image_url}
                         thumbnail
-                        className="img-cover rounded-4"
+                        className="img-cover rounded-4 flex-shrink-0"
                         style={{ width: '100px', height: '100px', minWidth: '100px' }}
                       />
-                      <div className="flex-grow-1">
-                        <h5 className="fw-bold mb-2">{item.name}</h5>
-                        <small className={`opacity-75 ${darkMode ? 'text-secondary' : 'text-muted'}`}>
+                      <div className="flex-grow-1 min-w-0">
+                        <h5 className="fw-bold mb-2" style={{ fontSize: 'clamp(1rem, 2.5vw, 1.25rem)' }}>{item.name}</h5>
+                        <small className={`opacity-75 ${darkMode ? 'text-secondary' : 'text-muted'}`} style={{ fontSize: 'clamp(0.8rem, 2vw, 0.9rem)' }}>
                           {t('addedAt')} {new Date(item.created_at).toLocaleString()}
                         </small>
                       </div>
-                      <div className="d-flex gap-2">
+                      <div className="d-flex gap-2 flex-shrink-0">
                         <Button
                           variant="primary"
                           size="sm"
                           onClick={() => onItemClick(item)}
-                          className="rounded-4 px-3 py-2 orange-btn"
+                          className="rounded-4 px-2 px-md-3 py-2 orange-btn"
+                          style={{ 
+                            whiteSpace: 'nowrap',
+                            fontSize: 'clamp(0.8rem, 2vw, 0.9rem)'
+                          }}
                         >
                           {t('viewDetail')}
                         </Button>
@@ -103,9 +107,13 @@ const FavoritesTab = ({ favorites, loading, onItemClick, onRemoveFavorite }) => 
                           variant="outline-danger"
                           size="sm"
                           onClick={() => onRemoveFavorite(item.dish_id)}
-                          className="rounded-4 px-3 py-2"
+                          className="rounded-4 px-2 px-md-3 py-2"
+                          style={{ 
+                            whiteSpace: 'nowrap',
+                            fontSize: 'clamp(0.8rem, 2vw, 0.9rem)'
+                          }}
                         >
-                          ❤️ {t('remove')}
+                          <span className="d-none d-sm-inline">❤️ </span>{t('remove')}
                         </Button>
                       </div>
                     </div>

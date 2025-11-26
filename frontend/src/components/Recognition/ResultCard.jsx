@@ -131,7 +131,7 @@ const ResultCard = ({ loading, error, dishData, onSaveToHistory, onLoginRequest,
                 )}
               </div>
 
-              <div className="result-action-group d-flex gap-3 flex-wrap mt-4">
+              <div className="result-action-group d-flex gap-2 gap-md-3 flex-wrap mt-3 mt-md-4">
                 {isLoggedIn ? (
                   <>
                     <Button
@@ -179,9 +179,9 @@ const ResultCard = ({ loading, error, dishData, onSaveToHistory, onLoginRequest,
         </div>
       </Card.Header>
 
-      <Card.Body className="p-4 p-lg-5">
-        <Row className="g-5">
-          <Col lg={7}>
+      <Card.Body className="p-3 p-md-4 p-lg-5">
+        <Row className="g-3 g-md-4 g-lg-5">
+          <Col xs={12} lg={7}>
             <section className={`${sectionSurfaceClass} mb-4`}>
               <h4 className="fw-bold mb-3">{t('dishOverview') || 'Tổng quan món ăn'}</h4>
               <p className="fs-5 mb-4">{dishDescription}</p>
@@ -249,7 +249,7 @@ const ResultCard = ({ loading, error, dishData, onSaveToHistory, onLoginRequest,
             </section>
           </Col>
 
-          <Col lg={5}>
+          <Col xs={12} lg={5}>
             <section className={sectionSurfaceClass}>
               <div className="d-flex align-items-center justify-content-between mb-3">
                 <h4 className="fw-bold mb-0">{t('ingredients')}</h4>

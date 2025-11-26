@@ -52,7 +52,15 @@ function App() {
       <AuthProvider>
         <ToastContainer autoClose={3000} hideProgressBar />
 
-        <AppNavbar onNavigate={handleNavigate} />
+        <AppNavbar 
+          onNavigate={handleNavigate}
+          activeTab={mainLayoutTab}
+          onTabChange={(tab) => {
+            if (currentView === 'main') {
+              setMainLayoutTab(tab);
+            }
+          }}
+        />
 
         <Container fluid className="px-0" style={{ maxWidth: '100%' }}>
           <Row className="g-0 m-0">
@@ -71,13 +79,13 @@ function App() {
             )}
 
             {currentView === 'login' && (
-              <Col md={6} lg={5} xl={4} className="mx-auto" style={{ marginTop: '2rem' }}>
+              <Col xs={12} sm={10} md={8} lg={6} xl={5} className="mx-auto px-3 px-md-4" style={{ marginTop: '1.5rem', marginBottom: '2rem' }}>
                 <LoginForm onNavigate={handleNavigate} />
               </Col>
             )}
 
             {currentView === 'register' && (
-              <Col md={6} lg={5} xl={4} className="mx-auto" style={{ marginTop: '2rem' }}>
+              <Col xs={12} sm={10} md={8} lg={6} xl={5} className="mx-auto px-3 px-md-4" style={{ marginTop: '1.5rem', marginBottom: '2rem' }}>
                 <RegisterForm onNavigate={handleNavigate} />
               </Col>
             )}

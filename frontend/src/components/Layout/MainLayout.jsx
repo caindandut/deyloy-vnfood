@@ -147,7 +147,7 @@ const MainLayout = ({ onNavigate, initialTab = 'upload', onTabChange }) => {
       case 'upload':
         return (
           <div className="warm-recognition-grid">
-            <Row className="g-4">
+            <Row className="g-3 g-md-4">
               <Col xs={12} lg={7}>
                 <UploadTab
                   selectedFile={recognition.selectedFile}
@@ -219,17 +219,17 @@ const MainLayout = ({ onNavigate, initialTab = 'upload', onTabChange }) => {
   return (
     <>
       <Row className="g-0" style={{ margin: 0 }}>
-        <Col xs={12} md={3} lg={2} style={{ padding: 0 }}>
+        <Col xs={12} md={12} lg={2} style={{ padding: 0 }} className="d-none d-lg-block">
           <Sidebar activeTab={activeTab} onTabChange={handleTabChange} />
         </Col>
-        <Col xs={12} md={9} lg={10} className="px-0">
+        <Col xs={12} md={12} lg={10} className="px-0 px-lg-3">
           <div className="max-w-7xl mx-auto">
             <Card 
               className={`layout-card shadow-sm ${darkMode ? 'bg-dark text-light border-secondary' : 'bg-white border-0'}`} 
             >
-              <Card.Body className="p-3 p-md-4">
+              <Card.Body className="p-3 p-md-4 p-lg-5">
                 {(activeTab === 'upload' || activeTab === 'webcam') && (
-                  <h3 className={`display-6 warm-heading fw-bold mb-4 ${darkMode ? 'text-white' : 'text-dark'}`}>
+                  <h3 className={`display-6 warm-heading fw-bold mb-3 mb-md-4 ${darkMode ? 'text-white' : 'text-dark'}`}>
                     {activeTab === 'upload' ? (t('recognizeFromFile') || 'Nhận diện từ File') : (t('recognizeFromWebcam') || 'Nhận diện từ Webcam')}
                   </h3>
                 )}

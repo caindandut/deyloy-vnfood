@@ -114,6 +114,8 @@ const ShoppingListTab = () => {
         onBack={() => {
           setShowDetail(false);
           setSelectedList(null);
+          // Refresh lists to get the latest updated_at from server
+          fetchLists();
         }}
         onRefresh={fetchLists}
         onMetadataChange={handleListMetadataChange}
@@ -171,17 +173,48 @@ const ShoppingListTab = () => {
             const checkedItems = list.checked_count || 0;
             const progress = totalItems === 0 ? 0 : Math.round((checkedItems / totalItems) * 100);
             const updatedLabel = list.updated_at
-              ? new Date(list.updated_at).toLocaleString(
-                  language === 'vi' ? 'vi-VN' : 'en-US',
-                  {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    second: '2-digit'
+              ? (() => {
+                  // MySQL DATETIME is timezone-naive, typically stored in UTC or server local time
+                  // If the string doesn't have timezone info (no Z or +/-), treat as UTC
+                  let dateStr = list.updated_at;
+                  // Check if it already has timezone info (Z or timezone offset like +07:00)
+                  const hasTimezone = dateStr.includes('Z') || 
+                                      /[+-]\d{2}:?\d{2}$/.test(dateStr) ||
+                                      /[+-]\d{4}$/.test(dateStr);
+                  if (!hasTimezone) {
+                    // MySQL format: "YYYY-MM-DD HH:MM:SS" - append Z to treat as UTC
+                    // Replace space with T for ISO format, then add Z
+                    dateStr = dateStr.replace(' ', 'T') + 'Z';
                   }
-                )
+                  const date = new Date(dateStr);
+                  // If still invalid, try parsing as-is (might be in local time)
+                  if (isNaN(date.getTime())) {
+                    return new Date(list.updated_at).toLocaleString(
+                      language === 'vi' ? 'vi-VN' : 'en-US',
+                      {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit',
+                        timeZone: 'Asia/Ho_Chi_Minh'
+                      }
+                    );
+                  }
+                  return date.toLocaleString(
+                    language === 'vi' ? 'vi-VN' : 'en-US',
+                    {
+                      day: '2-digit',
+                      month: '2-digit',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      second: '2-digit',
+                      timeZone: 'Asia/Ho_Chi_Minh'
+                    }
+                  );
+                })()
               : '-';
 
             return (
