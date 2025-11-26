@@ -42,7 +42,12 @@ async def register(user: UserCreate):
     hashed_pass = hash_password(user.password)
 
     try:
-        cursor.execute("INSERT INTO users (username, hashed_password) VALUES (%s, %s)", (user.username, hashed_pass))
+        # Manual ID generation because TiDB migration might have missed AUTO_INCREMENT
+        cursor.execute("SELECT MAX(id) FROM users")
+        row = cursor.fetchone()
+        next_id = (row['MAX(id)'] or 0) + 1
+        
+        cursor.execute("INSERT INTO users (id, username, hashed_password) VALUES (%s, %s, %s)", (next_id, user.username, hashed_pass))
         conn.commit()
     except mysql.connector.Error as err:
         print(f"Lỗi khi đăng ký: {err}")
