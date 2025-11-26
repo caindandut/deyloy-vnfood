@@ -1,0 +1,36 @@
+import React from 'react';
+import { Card } from 'react-bootstrap';
+import { useTheme } from '../../contexts/ThemeContext';
+
+const DishCard = ({ dish, onClick }) => {
+  const { darkMode } = useTheme();
+
+  return (
+    <Card
+      className={`h-100 shadow-sm ${darkMode ? 'bg-dark text-light border-secondary' : 'bg-white border-0'}`}
+      style={{
+        cursor: 'pointer',
+        borderRadius: '1.5rem',
+        overflow: 'hidden'
+      }}
+      onClick={onClick}
+    >
+      <Card.Img
+        variant="top"
+        src={dish.image_url || 'https://via.placeholder.com/300x200.png?text=Ảnh+món+ăn'}
+        alt={dish.name}
+        className="img-cover"
+        style={{
+          height: '220px'
+        }}
+      />
+      <Card.Body className="p-4">
+        <Card.Title className="fs-5 fw-semibold mb-0">
+          {dish.name}
+        </Card.Title>
+      </Card.Body>
+    </Card>
+  );
+};
+
+export default DishCard;

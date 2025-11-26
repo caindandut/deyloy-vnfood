@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+mysql-connector-python
+python-multipart
+python-dotenv
+python-jose[cryptography]
+passlib[bcrypt]
+httpx
+Pillow
+numpy
+opencv-python-headless
+# Torch CPU version is recommended for Render to save slug size
+# It will be installed via build command
+torch
+torchvision

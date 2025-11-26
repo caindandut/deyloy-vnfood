@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+*.env
+
+# Node
+node_modules/
+dist/
+build/
+.next/
+
+# IDE
+.vscode/
+.idea/
+
+# System
+.DS_Store
+Thumbs.db
+
+# Models (Too large for git, usually handled via LFS or download script, but user has them locally)
+# If user wants to push models to git, they need Git LFS. 
+# For Render Free Tier, pushing 100MB+ models might be slow or hit limits, but let's assume they want to push them for now.
+# If they are too big, we might need to ignore them and download them during build.
+# backend/*.pth
+# backend/*.pt
