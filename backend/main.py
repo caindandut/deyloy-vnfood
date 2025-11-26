@@ -40,6 +40,10 @@ except Exception as e:
     import traceback
     traceback.print_exc()
 
+@app.get("/")
+async def root():
+    return {"message": "Welcome to VnFood Backend API", "status": "running"}
+
 print("\nRegistered routes:")
 for route in app.routes:
     if hasattr(route, 'path') and hasattr(route, 'methods'):
