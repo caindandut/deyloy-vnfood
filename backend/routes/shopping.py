@@ -33,12 +33,17 @@ async def create_shopping_list(
         user_id = user_db['id']
         list_name = data.name or "Danh sách mua sắm"
         
+        # Manual ID generation
+        cursor.execute("SELECT MAX(id) FROM shopping_lists")
+        row = cursor.fetchone()
+        next_id = (row['MAX(id)'] or 0) + 1
+        
         cursor.execute(
-            "INSERT INTO shopping_lists (user_id, name) VALUES (%s, %s)",
-            (user_id, list_name)
+            "INSERT INTO shopping_lists (id, user_id, name) VALUES (%s, %s, %s)",
+            (next_id, user_id, list_name)
         )
         conn.commit()
-        list_id = cursor.lastrowid
+        list_id = next_id
         
         return {
             "id": list_id,
@@ -192,15 +197,20 @@ async def add_item_to_list(
         if not cursor.fetchone():
             raise HTTPException(status_code=404, detail="Không tìm thấy danh sách mua sắm")
         
+        # Manual ID generation
+        cursor.execute("SELECT MAX(id) FROM shopping_list_items")
+        row = cursor.fetchone()
+        next_id = (row['MAX(id)'] or 0) + 1
+
         cursor.execute(
             """INSERT INTO shopping_list_items 
-               (list_id, ingredient_id, ingredient_name, quantity, is_checked) 
-               VALUES (%s, %s, %s, %s, %s)""",
-            (list_id, item.ingredient_id, item.ingredient_name, item.quantity, item.is_checked or False)
+               (id, list_id, ingredient_id, ingredient_name, quantity, is_checked) 
+               VALUES (%s, %s, %s, %s, %s, %s)""",
+            (next_id, list_id, item.ingredient_id, item.ingredient_name, item.quantity, item.is_checked or False)
         )
         cursor.execute("UPDATE shopping_lists SET updated_at = NOW() WHERE id = %s", (list_id,))
         conn.commit()
-        item_id = cursor.lastrowid
+        item_id = next_id
         
         cursor.execute(
             """SELECT sli.id, sli.ingredient_id, sli.ingredient_name, 
@@ -255,6 +265,11 @@ async def add_dish_to_shopping_list(
         ingredients = get_dish_ingredients(data.dish_id, cursor, language)
         
         added_count = 0
+        # Get initial max ID
+        cursor.execute("SELECT MAX(id) FROM shopping_list_items")
+        row = cursor.fetchone()
+        next_id = (row['MAX(id)'] or 0) + 1
+
         for ing in ingredients:
             if ing.get('name'):
                 cursor.execute(
@@ -267,10 +282,11 @@ async def add_dish_to_shopping_list(
             
             cursor.execute(
                 """INSERT INTO shopping_list_items 
-                   (list_id, ingredient_name, quantity, is_checked) 
-                   VALUES (%s, %s, %s, %s)""",
-                (data.list_id, ing['name'], ing['quantity'], False)
+                   (id, list_id, ingredient_name, quantity, is_checked) 
+                   VALUES (%s, %s, %s, %s, %s)""",
+                (next_id, data.list_id, ing['name'], ing['quantity'], False)
             )
+            next_id += 1
             added_count += 1
         
         cursor.execute("UPDATE shopping_lists SET updated_at = NOW() WHERE id = %s", (data.list_id,))

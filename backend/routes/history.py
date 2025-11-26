@@ -66,7 +66,12 @@ async def save_history(request: SaveHistoryRequest, current_user: str = Depends(
 
         user_id = user_db['id']
 
-        cursor.execute("INSERT INTO history (user_id, dish_id) VALUES (%s, %s)", (user_id, request.dish_id))
+        # Manual ID generation
+        cursor.execute("SELECT MAX(id) FROM history")
+        row = cursor.fetchone()
+        next_id = (row['MAX(id)'] or 0) + 1
+
+        cursor.execute("INSERT INTO history (id, user_id, dish_id) VALUES (%s, %s, %s)", (next_id, user_id, request.dish_id))
         conn.commit()
 
         return {"message": "Đã lưu vào lịch sử thành công"}

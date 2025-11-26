@@ -42,9 +42,14 @@ async def add_favorite(
         if not dish:
             raise HTTPException(status_code=404, detail="Không tìm thấy món ăn")
         
+        # Manual ID generation
+        cursor.execute("SELECT MAX(id) FROM favorites")
+        row = cursor.fetchone()
+        next_id = (row['MAX(id)'] or 0) + 1
+
         cursor.execute(
-            "INSERT IGNORE INTO favorites (user_id, dish_id) VALUES (%s, %s)",
-            (user_id, favorite.dish_id)
+            "INSERT IGNORE INTO favorites (id, user_id, dish_id) VALUES (%s, %s, %s)",
+            (next_id, user_id, favorite.dish_id)
         )
         conn.commit()
         
