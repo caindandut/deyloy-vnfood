@@ -4,7 +4,7 @@ mysql-connector-python
 python-multipart
 python-dotenv
 python-jose[cryptography]
-passlib[bcrypt]
+bcrypt
 httpx
 Pillow
 numpy
