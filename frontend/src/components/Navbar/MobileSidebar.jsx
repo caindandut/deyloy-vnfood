@@ -164,7 +164,7 @@ const MobileSidebar = ({ show, onHide, onNavigate, activeTab, onTabChange }) => 
             }}
           >
             <span style={{ fontSize: '1.1rem', color: '#ff8f3f' }}>{darkMode ? '☀️' : '🌙'}</span>
-            <span>{t('darkMode')}</span>
+            <span>{darkMode ? t('lightMode') : t('darkMode')}</span>
           </Button>
         </div>
 
