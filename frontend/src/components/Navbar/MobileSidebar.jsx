@@ -7,6 +7,9 @@ const MobileSidebar = ({ show, onHide, onNavigate, activeTab, onTabChange }) => 
   const { isLoggedIn, currentUser, logout } = useAuth();
   const { darkMode, language, toggleDarkMode, setLanguage, t } = useTheme();
 
+  const modeText = darkMode ? t('lightMode') : t('darkMode');
+  const modeIcon = darkMode ? '☀️' : '🌙';
+
   const handleLogout = () => {
     logout(t);
     onHide();
@@ -163,8 +166,8 @@ const MobileSidebar = ({ show, onHide, onNavigate, activeTab, onTabChange }) => 
               boxShadow: 'none'
             }}
           >
-            <span style={{ fontSize: '1.1rem', color: '#ff8f3f' }}>{darkMode ? '☀️' : '🌙'}</span>
-            <span>{darkMode ? t('lightMode') : t('darkMode')}</span>
+            <span style={{ fontSize: '1.1rem', color: '#ff8f3f' }}>{modeIcon}</span>
+            <span>{modeText}</span>
           </Button>
         </div>
 
