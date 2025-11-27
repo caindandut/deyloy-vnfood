@@ -73,7 +73,7 @@ const AppNavbar = ({ onNavigate, activeTab, onTabChange }) => {
           </Navbar.Brand>
           
           {/* Mobile Title - Show on mobile only, no icon */}
-          <div className="d-lg-none flex-grow-1" style={{ marginLeft: '7rem' }}>
+          <div className="d-lg-none flex-grow-1" style={{ marginLeft: '5rem' }}>
             <span 
               className="fw-bold"
               style={{ 

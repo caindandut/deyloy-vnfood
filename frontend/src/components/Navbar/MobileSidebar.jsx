@@ -163,7 +163,7 @@ const MobileSidebar = ({ show, onHide, onNavigate, activeTab, onTabChange }) => 
               boxShadow: 'none'
             }}
           >
-            <span style={{ fontSize: '1.1rem', color: '#ff8f3f' }}>🌙</span>
+            <span style={{ fontSize: '1.1rem', color: '#ff8f3f' }}>{darkMode ? '☀️' : '🌙'}</span>
             <span>{t('darkMode')}</span>
           </Button>
         </div>
