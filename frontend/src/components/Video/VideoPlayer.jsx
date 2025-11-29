@@ -1,9 +1,33 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import { useTheme } from '../../contexts/ThemeContext';
 
 const VideoPlayer = ({ show, videoUrl, onClose, title }) => {
   const { darkMode, t } = useTheme();
+
+  // Cleanup modal backdrops and body styles when modal closes
+  useEffect(() => {
+    if (!show) {
+      // Small delay to ensure modal animation completes
+      const cleanupTimer = setTimeout(() => {
+        // Remove any stray modal backdrops
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach(backdrop => backdrop.remove());
+        
+        // Reset body styles
+        if (document.body.classList.contains('modal-open')) {
+          const modalCount = document.querySelectorAll('.modal.show').length;
+          if (modalCount === 0) {
+            document.body.classList.remove('modal-open');
+            document.body.style.overflow = '';
+            document.body.style.paddingRight = '';
+          }
+        }
+      }, 300); // Match Bootstrap modal transition time
+
+      return () => clearTimeout(cleanupTimer);
+    }
+  }, [show]);
 
   if (!videoUrl) return null;
 

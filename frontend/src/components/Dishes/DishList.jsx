@@ -298,9 +298,15 @@ const DishList = ({ onNavigate }) => {
           setSelectedDish(null);
         }}
         onOpenVideo={(url, name) => {
-          setVideoUrl(url);
-          setVideoTitle(`${name} - ${t('videoInstructions') || 'Video hướng dẫn'}`);
-          setShowVideo(true);
+          // Close parent modal first to prevent modal stacking issues
+          setShowDetail(false);
+          setSelectedDish(null);
+          // Small delay to let the modal close animation complete
+          setTimeout(() => {
+            setVideoUrl(url);
+            setVideoTitle(`${name} - ${t('videoInstructions') || 'Video hướng dẫn'}`);
+            setShowVideo(true);
+          }, 300);
         }}
       />
 
