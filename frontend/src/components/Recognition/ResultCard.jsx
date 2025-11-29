@@ -17,7 +17,7 @@ import { favoritesApi } from '../../services/api';
 import VideoPlayer from '../Video/VideoPlayer';
 import AddToShoppingList from '../Shopping/AddToShoppingList';
 
-const ResultCard = ({ loading, error, dishData, onSaveToHistory, onLoginRequest, onToggleFavorite }) => {
+const ResultCard = ({ loading, error, dishData, onLoginRequest, onToggleFavorite }) => {
   const { isLoggedIn } = useAuth();
   const { darkMode, language, t } = useTheme();
   const [isFavorite, setIsFavorite] = useState(false);
@@ -135,14 +135,6 @@ const ResultCard = ({ loading, error, dishData, onSaveToHistory, onLoginRequest,
                 {isLoggedIn ? (
                   <>
                     <Button
-                      variant="light"
-                      size="sm"
-                      onClick={onSaveToHistory}
-                      className="rounded-4 px-3 py-2 fw-medium transition-all"
-                    >
-                      🔖 {t('saveToHistory')}
-                    </Button>
-                    <Button
                       variant={isFavorite ? 'danger' : 'outline-light'}
                       size="sm"
                       onClick={handleFavoriteClick}
@@ -211,18 +203,28 @@ const ResultCard = ({ loading, error, dishData, onSaveToHistory, onLoginRequest,
             </section>
 
             <section className={sectionSurfaceClass}>
-              <div className="d-flex align-items-center justify-content-between mb-3">
-                <h4 className="fw-bold mb-0">{t('steps')}</h4>
-                <span className="text-muted">
-                  {dishData.instructions.length} {t('stepCountLabel') || 'bước'}
-                </span>
-              </div>
-              <Accordion alwaysOpen>
-                {dishData.instructions
-                  .filter((step, index, self) =>
-                    index === self.findIndex(s => s.step_number === step.step_number)
-                  )
-                  .map((step, index) => (
+              {(() => {
+                // Sort first, then use Map to ensure unique step_number
+                const sorted = [...dishData.instructions].sort((a, b) => Number(a.step_number) - Number(b.step_number));
+                const seen = new Map();
+                const unique = sorted.filter(step => {
+                  const stepNum = Number(step.step_number);
+                  if (!seen.has(stepNum)) {
+                    seen.set(stepNum, true);
+                    return true;
+                  }
+                  return false;
+                });
+                return (
+                  <>
+                    <div className="d-flex align-items-center justify-content-between mb-3">
+                      <h4 className="fw-bold mb-0">{t('steps')}</h4>
+                      <span className="text-muted">
+                        {unique.length} {t('stepCountLabel') || 'bước'}
+                      </span>
+                    </div>
+                    <Accordion alwaysOpen>
+                      {unique.map((step, index) => (
                     <Accordion.Item
                       eventKey={`${step.step_number}-${index}`}
                       key={`step-${dishData.dish.id}-${step.step_number}-${index}`}
@@ -244,8 +246,11 @@ const ResultCard = ({ loading, error, dishData, onSaveToHistory, onLoginRequest,
                         )}
                       </Accordion.Body>
                     </Accordion.Item>
-                  ))}
-              </Accordion>
+                      ))}
+                    </Accordion>
+                  </>
+                );
+              })()}
             </section>
           </Col>
 

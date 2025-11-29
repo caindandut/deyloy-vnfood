@@ -4,7 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 
 const MobileSidebar = ({ show, onHide, onNavigate, activeTab, onTabChange }) => {
-  const { isLoggedIn, currentUser, logout } = useAuth();
+  const { isLoggedIn, currentUser, logout, isAdmin } = useAuth();
   const { darkMode, language, toggleDarkMode, setLanguage, t } = useTheme();
 
   const modeText = darkMode ? t('lightMode') : t('darkMode');
@@ -21,7 +21,7 @@ const MobileSidebar = ({ show, onHide, onNavigate, activeTab, onTabChange }) => 
     }
     if (key === 'dishes') {
       onNavigate('dishes');
-    } else if (key === 'upload' || key === 'webcam' || key === 'history' || key === 'favorites' || key === 'shopping') {
+    } else if (['upload', 'webcam', 'history', 'favorites', 'shopping', 'admin-dishes', 'admin-ingredients', 'admin-instructions', 'admin-users', 'admin-analytics'].includes(key)) {
       onNavigate('main', key);
     }
     onHide();
@@ -41,9 +41,19 @@ const MobileSidebar = ({ show, onHide, onNavigate, activeTab, onTabChange }) => 
         { key: 'shopping', icon: '🛒', label: t('shoppingList') || 'Danh sách mua sắm' }
       );
     }
+
+    if (isAdmin) {
+      items.push(
+        { key: 'admin-dishes', icon: '🛠️', label: t('adminDishes') || 'Quản lý món' },
+        { key: 'admin-ingredients', icon: '🥕', label: t('adminIngredientsTab') || 'Quản lý nguyên liệu' },
+        { key: 'admin-instructions', icon: '📘', label: t('adminInstructionsTab') || 'Quản lý hướng dẫn' },
+        { key: 'admin-users', icon: '👥', label: t('adminUsersTab') || 'Quản lý người dùng' },
+        { key: 'admin-analytics', icon: '📈', label: t('adminAnalyticsTab') || 'Thống kê' }
+      );
+    }
     
     return items;
-  }, [isLoggedIn, t]);
+  }, [isLoggedIn, isAdmin, t]);
 
   return (
     <Offcanvas
@@ -92,7 +102,7 @@ const MobileSidebar = ({ show, onHide, onNavigate, activeTab, onTabChange }) => 
                   <span className="mobile-sidebar-icon" style={{ fontSize: '1.5rem' }}>
                     {item.icon}
                   </span>
-                  <span className="mobile-sidebar-label" style={{ fontSize: '1rem' }}>
+                  <span className="mobile-sidebar-label text-nowrap" style={{ fontSize: '0.85rem' }}>
                     {item.label}
                   </span>
                 </Nav.Link>

@@ -43,6 +43,43 @@ async def predict(
     try:
         result = get_food_details(class_id, cursor, language)
         result['confidence'] = round(confidence_score * 100, 2)
+        
+        # Tự động lưu vào history nếu user đã đăng nhập
+        if current_user:
+            try:
+                dish_id = result['dish']['id']
+                cursor.execute("SELECT id FROM users WHERE username = %s", (current_user,))
+                user_db = cursor.fetchone()
+                if user_db:
+                    user_id = user_db['id']
+                    # Tự động lưu vào history (không cần user phải click "Lưu")
+                    # Check xem đã có trong vòng 10 giây gần đây chưa để tránh duplicate khi nhận diện liên tục
+                    cursor.execute(
+                        """
+                        SELECT id FROM history 
+                        WHERE user_id = %s AND dish_id = %s 
+                        AND recognized_at >= DATE_SUB(NOW(), INTERVAL 10 SECOND)
+                        LIMIT 1
+                        """,
+                        (user_id, dish_id)
+                    )
+                    recent_entry = cursor.fetchone()
+                    
+                    if not recent_entry:
+                        # Chưa có trong 10 giây gần đây, lưu mới
+                        cursor.execute("SELECT MAX(id) FROM history")
+                        row = cursor.fetchone()
+                        next_id = (row['MAX(id)'] or 0) + 1
+                        cursor.execute(
+                            "INSERT INTO history (id, user_id, dish_id) VALUES (%s, %s, %s)",
+                            (next_id, user_id, dish_id)
+                        )
+                        conn.commit()
+            except Exception as e:
+                # Don't fail the request if logging fails, just print error
+                print(f"Lỗi khi tự động lưu vào history: {e}")
+                conn.rollback()
+        
         return result
 
     except HTTPException as e:

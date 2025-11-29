@@ -40,6 +40,54 @@ const DishList = ({ onNavigate }) => {
     fetchDishes();
   }, [debouncedSearch, page, language]);
 
+  const closeAllModals = useCallback(() => {
+    // Close modals
+    setShowDetail(false);
+    setSelectedDish(null);
+    setShowVideo(false);
+    setVideoUrl(null);
+    setVideoTitle('');
+    
+    // Immediately clean up Bootstrap modal classes and backdrops
+    // This is critical to prevent layout issues
+    if (document.body.classList.contains('modal-open')) {
+      document.body.classList.remove('modal-open');
+      document.body.style.paddingRight = '';
+    }
+    const backdrops = document.querySelectorAll('.modal-backdrop');
+    backdrops.forEach(backdrop => backdrop.remove());
+  }, []);
+
+  // Effect to clean up when modals close (only if modals were actually open)
+  useEffect(() => {
+    // Only cleanup if we're sure modals are closed and component is still mounted
+    if (!showDetail && !showVideo) {
+      // Use a small delay to ensure Bootstrap has finished its cleanup
+      const timeoutId = setTimeout(() => {
+        // Only cleanup if modals are still closed (double check)
+        if (!showDetail && !showVideo) {
+          if (document.body.classList.contains('modal-open')) {
+            document.body.classList.remove('modal-open');
+            document.body.style.paddingRight = '';
+          }
+          const backdrops = document.querySelectorAll('.modal-backdrop');
+          backdrops.forEach(backdrop => backdrop.remove());
+        }
+      }, 150);
+      
+      return () => clearTimeout(timeoutId);
+    }
+  }, [showDetail, showVideo]);
+
+  // Cleanup: Close all modals and clean up body styles when component unmounts
+  useEffect(() => {
+    return () => {
+      // Clean up Bootstrap modal classes from body
+      // This is critical to prevent layout issues when navigating away
+      closeAllModals();
+    };
+  }, [closeAllModals]); // Include closeAllModals in dependencies
+
   const fetchDishes = async () => {
     setLoading(true);
     setError(null);
@@ -88,23 +136,21 @@ const DishList = ({ onNavigate }) => {
   const handleSidebarNavigation = (key) => {
     if (!onNavigate) return;
     
-    if (showDetail) {
-      setShowDetail(false);
-      setSelectedDish(null);
-    }
-    if (showVideo) {
-      setShowVideo(false);
-      setVideoUrl(null);
-      setVideoTitle('');
-    }
+    // Close all modals immediately before navigation
+    closeAllModals();
     
-    if (key === 'dishes') {
-      return;
-    } else if (key === 'upload' || key === 'webcam' || key === 'history' || key === 'favorites' || key === 'shopping') {
-      onNavigate('main', key);
-    } else {
-      onNavigate(key);
-    }
+    // Small delay to ensure cleanup completes before navigation
+    // This ensures modals are closed and cleaned up before view switch
+    setTimeout(() => {
+      if (key === 'dishes') {
+        return;
+      } else if (key === 'upload' || key === 'webcam' || key === 'history' || key === 'favorites' || key === 'shopping') {
+        onNavigate('main', key);
+      } else {
+        // For admin tabs, navigate directly
+        onNavigate('main', key);
+      }
+    }, 100); // Increased delay to ensure cleanup completes
   };
 
   return (

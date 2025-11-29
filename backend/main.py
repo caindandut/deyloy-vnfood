@@ -9,9 +9,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 try:
-    from routes import auth, recognition, history, favorites, dishes, shopping
+    from routes import auth, recognition, history, favorites, dishes, shopping, admin_dishes, admin_users, analytics
 except ImportError:
-    from backend.routes import auth, recognition, history, favorites, dishes, shopping
+    from backend.routes import auth, recognition, history, favorites, dishes, shopping, admin_dishes, admin_users, analytics
 
 app = FastAPI()
 app.add_middleware(
@@ -40,6 +40,12 @@ try:
     print("✓ Registered dishes router")
     app.include_router(shopping.router, tags=["Shopping List"])
     print("✓ Registered shopping router")
+    app.include_router(admin_dishes.router, tags=["Admin"])
+    print("✓ Registered admin router")
+    app.include_router(admin_users.router, tags=["Admin Users"])
+    print("✓ Registered admin users router")
+    app.include_router(analytics.router, tags=["Admin Analytics"])
+    print("✓ Registered admin analytics router")
 except Exception as e:
     print(f"Error registering routers: {e}")
     import traceback

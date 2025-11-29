@@ -6,11 +6,41 @@ from jose import JWTError, jwt
 from datetime import datetime, timedelta, timezone
 
 from .config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
+from .database import get_db_connection
 
 import bcrypt
 
 # pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto") # Removed passlib
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+
+
+def _get_user_record(username: str):
+    conn = get_db_connection()
+    if not conn:
+        return None
+    cursor = conn.cursor(dictionary=True)
+    try:
+        cursor.execute(
+            "SELECT id, username, role, is_active, created_at FROM users WHERE username = %s",
+            (username,)
+        )
+        return cursor.fetchone()
+    finally:
+        cursor.close()
+        conn.close()
+
+
+def get_user_profile(username: str):
+    return _get_user_record(username)
+
+
+def is_admin_user(username: Optional[str]) -> bool:
+    if not username:
+        return False
+    record = _get_user_record(username)
+    if not record:
+        return False
+    return (record.get("role") or "").lower() == "admin"
 
 def verify_password(plain_password, hashed_password):
     if isinstance(plain_password, str):
@@ -55,12 +85,35 @@ async def get_current_user_optional(authorization: Optional[str] = Header(None))
         return None
 
 async def get_current_user_required(authorization: Optional[str] = Header(None)):
-    user = await get_current_user_optional(authorization)
-    if user is None:
+    username = await get_current_user_optional(authorization)
+    if username is None:
         raise HTTPException(
             status_code=401,
             detail="Yêu cầu đăng nhập để thực hiện hành động này",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    return user
+    record = _get_user_record(username)
+    if record is None:
+        raise HTTPException(
+            status_code=401,
+            detail="Tài khoản không tồn tại",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    if not record.get("is_active", True):
+        raise HTTPException(
+            status_code=403,
+            detail="Tài khoản đã bị khóa",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return username
+
+
+async def get_current_admin_user(authorization: Optional[str] = Header(None)):
+    username = await get_current_user_required(authorization)
+    if not is_admin_user(username):
+        raise HTTPException(
+            status_code=403,
+            detail="Tài khoản không có quyền admin"
+        )
+    return username
 

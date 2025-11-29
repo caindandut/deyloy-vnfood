@@ -15,21 +15,43 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [userRole, setUserRole] = useState('user');
+  const [isActive, setIsActive] = useState(true);
   const [loading, setLoading] = useState(false);
+
+  const resetAuthState = useCallback(() => {
+    setIsLoggedIn(false);
+    setCurrentUser(null);
+    setIsAdmin(false);
+    setUserRole('user');
+    setIsActive(true);
+  }, []);
 
   const checkLoginStatus = useCallback(async () => {
     const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        const response = await authApi.checkAuth();
-        setCurrentUser(response.data.username);
-        setIsLoggedIn(true);
-      } catch (e) {
-        localStorage.removeItem('token');
-        setIsLoggedIn(false);
-      }
+    if (!token) {
+      resetAuthState();
+      return;
     }
-  }, []);
+
+    try {
+      const response = await authApi.checkAuth();
+      if (response.data?.is_active === false) {
+        localStorage.removeItem('token');
+        resetAuthState();
+        return;
+      }
+      setCurrentUser(response.data.username);
+      setIsLoggedIn(true);
+      setIsAdmin(Boolean(response.data.is_admin));
+      setUserRole(response.data.role || 'user');
+      setIsActive(response.data.is_active !== false);
+    } catch (e) {
+      localStorage.removeItem('token');
+      resetAuthState();
+    }
+  }, [resetAuthState]);
 
   useEffect(() => {
     checkLoginStatus();
@@ -57,8 +79,7 @@ export const AuthProvider = ({ children }) => {
       const token = response.data.access_token;
       localStorage.setItem('token', token);
 
-      setCurrentUser(username);
-      setIsLoggedIn(true);
+      await checkLoginStatus();
       toast.success(t('loginSuccess'));
       return { success: true };
     } catch (err) {
@@ -72,14 +93,16 @@ export const AuthProvider = ({ children }) => {
 
   const logout = (t) => {
     localStorage.removeItem('token');
-    setIsLoggedIn(false);
-    setCurrentUser(null);
+    resetAuthState();
     toast.info(t('logoutSuccess'));
   };
 
   const value = {
     isLoggedIn,
     currentUser,
+    isAdmin,
+    userRole,
+    isActive,
     loading,
     register,
     login,

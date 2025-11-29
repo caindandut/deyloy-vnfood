@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Container, Row, Col } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { ToastContainer } from 'react-toastify';
@@ -18,29 +18,85 @@ function App() {
   const [currentView, setCurrentView] = useState('main');
   const [mainLayoutTab, setMainLayoutTab] = useState('upload');
 
+  // Removed MutationObserver as it was interfering with normal Bootstrap modal behavior
+  // Cleanup is now handled explicitly when needed
+
+  // Cleanup modals only when switching between different views (dishes <-> main/login/register)
+  const prevViewRef = useRef(currentView);
   useEffect(() => {
-    if (typeof window === 'undefined' || typeof MutationObserver === 'undefined') {
-      return;
+    const prevView = prevViewRef.current;
+    // Only cleanup when switching away from 'dishes' view (where modals might be open)
+    if (prevView === 'dishes' && currentView !== 'dishes') {
+      // Aggressive cleanup when leaving dishes view
+      const cleanupModals = () => {
+        // Remove modal-open class
+        if (document.body.classList.contains('modal-open')) {
+          document.body.classList.remove('modal-open');
+        }
+        // Remove padding-right style
+        if (document.body.style.paddingRight) {
+          document.body.style.paddingRight = '';
+        }
+        // Remove all modal backdrops
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach(backdrop => backdrop.remove());
+        // Also remove any modal elements that might be lingering
+        const modals = document.querySelectorAll('.modal.show, .modal.fade.show');
+        modals.forEach(modal => {
+          modal.classList.remove('show');
+          modal.style.display = 'none';
+        });
+      };
+      
+      // Cleanup immediately and with multiple delays to catch all cases
+      cleanupModals();
+      const timeout1 = setTimeout(cleanupModals, 50);
+      const timeout2 = setTimeout(cleanupModals, 150);
+      const timeout3 = setTimeout(cleanupModals, 300);
+      
+      prevViewRef.current = currentView;
+      return () => {
+        clearTimeout(timeout1);
+        clearTimeout(timeout2);
+        clearTimeout(timeout3);
+      };
     }
-
-    const ensureBodyPadding = () => {
-      if (document.body.classList.contains('modal-open')) {
-        document.body.style.paddingRight = '0px';
-      } else if (document.body.style.paddingRight) {
-        document.body.style.paddingRight = '0px';
-      }
-    };
-
-    const observer = new MutationObserver(ensureBodyPadding);
-    observer.observe(document.body, { attributes: true, attributeFilter: ['class', 'style'] });
-
-    return () => {
-      observer.disconnect();
-      document.body.style.paddingRight = '';
-    };
-  }, []);
+    prevViewRef.current = currentView;
+  }, [currentView]);
 
   const handleNavigate = (view, tab = null) => {
+    // Only clean up modals when leaving dishes view
+    if (currentView === 'dishes' && view !== 'dishes') {
+      // Aggressive cleanup when leaving dishes view
+      const cleanupModals = () => {
+        // Remove modal-open class
+        if (document.body.classList.contains('modal-open')) {
+          document.body.classList.remove('modal-open');
+        }
+        // Remove padding-right style
+        if (document.body.style.paddingRight) {
+          document.body.style.paddingRight = '';
+        }
+        // Remove all modal backdrops
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach(backdrop => backdrop.remove());
+        // Also remove any modal elements that might be lingering
+        const modals = document.querySelectorAll('.modal.show, .modal.fade.show');
+        modals.forEach(modal => {
+          modal.classList.remove('show');
+          modal.style.display = 'none';
+        });
+      };
+      
+      // Cleanup immediately
+      cleanupModals();
+      
+      // Also cleanup after delays to catch any async cleanup
+      setTimeout(cleanupModals, 50);
+      setTimeout(cleanupModals, 150);
+      setTimeout(cleanupModals, 300);
+    }
+    
     setCurrentView(view);
     if (tab && view === 'main') {
       setMainLayoutTab(tab);

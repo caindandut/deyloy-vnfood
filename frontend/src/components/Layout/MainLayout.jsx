@@ -17,10 +17,15 @@ import FavoritesTab from '../Favorites/FavoritesTab';
 import FavoriteModal from '../Favorites/FavoriteModal';
 import ShoppingListTab from '../Shopping/ShoppingListTab';
 import VideoPlayer from '../Video/VideoPlayer';
+import AdminDishManagement from '../Admin/DishManagement';
+import AdminIngredientManagement from '../Admin/IngredientManagement';
+import AdminInstructionManagement from '../Admin/InstructionManagement';
+import AdminUserManagement from '../Admin/UserManagement';
+import AnalyticsDashboard from '../Admin/AnalyticsDashboard';
 import { useFavorites } from '../../hooks/useFavorites';
 
 const MainLayout = ({ onNavigate, initialTab = 'upload', onTabChange }) => {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, isAdmin } = useAuth();
   const { darkMode, language, t } = useTheme();
   const [activeTab, setActiveTab] = useState(initialTab);
   const [showVideo, setShowVideo] = useState(false);
@@ -34,6 +39,32 @@ const MainLayout = ({ onNavigate, initialTab = 'upload', onTabChange }) => {
 
   const prevInitialTabRef = useRef(initialTab);
   const isInternalChangeRef = useRef(false);
+  
+  // Cleanup any lingering modal states when MainLayout mounts
+  // This ensures no modal state from dishes view carries over
+  useEffect(() => {
+    const cleanupModals = () => {
+      if (document.body.classList.contains('modal-open')) {
+        document.body.classList.remove('modal-open');
+      }
+      if (document.body.style.paddingRight) {
+        document.body.style.paddingRight = '';
+      }
+      const backdrops = document.querySelectorAll('.modal-backdrop');
+      backdrops.forEach(backdrop => backdrop.remove());
+      const modals = document.querySelectorAll('.modal.show, .modal.fade.show');
+      modals.forEach(modal => {
+        modal.classList.remove('show');
+        modal.style.display = 'none';
+      });
+    };
+    
+    // Cleanup on mount and after a short delay
+    cleanupModals();
+    const timeoutId = setTimeout(cleanupModals, 100);
+    
+    return () => clearTimeout(timeoutId);
+  }, []); // Only run on mount
   
   useEffect(() => {
     if (isInternalChangeRef.current) {
@@ -118,23 +149,6 @@ const MainLayout = ({ onNavigate, initialTab = 'upload', onTabChange }) => {
     }
   }, [isLoggedIn, onNavigate, recognition, historyHook, favoritesHook, onTabChange]);
 
-  const handleSaveToHistory = async () => {
-    const success = await historyHook.saveToHistory(
-      recognition.dishData,
-      isLoggedIn,
-      t,
-      () => {
-        if (activeTab === 'history') {
-          historyHook.fetchHistory(isLoggedIn);
-        }
-      }
-    );
-
-    if (!success && !isLoggedIn) {
-      onNavigate('login');
-    }
-  };
-
   const handleLoginRequest = () => {
     toast.warn(t('pleaseLoginToSave'));
     onNavigate('login');
@@ -211,6 +225,61 @@ const MainLayout = ({ onNavigate, initialTab = 'upload', onTabChange }) => {
         );
       case 'shopping':
         return <ShoppingListTab />;
+      case 'admin-dishes':
+        return isAdmin ? (
+          <AdminDishManagement />
+        ) : (
+          <div className="py-5 text-center">
+            <h5 className="fw-bold mb-2">{t('adminNotAuthorized') || 'Bạn không có quyền truy cập'}</h5>
+            <p className="text-muted mb-0">
+              {t('adminLoginAsPrivileged') || 'Vui lòng đăng nhập bằng tài khoản admin để tiếp tục.'}
+            </p>
+          </div>
+        );
+      case 'admin-ingredients':
+        return isAdmin ? (
+          <AdminIngredientManagement />
+        ) : (
+          <div className="py-5 text-center">
+            <h5 className="fw-bold mb-2">{t('adminNotAuthorized') || 'Bạn không có quyền truy cập'}</h5>
+            <p className="text-muted mb-0">
+              {t('adminLoginAsPrivileged') || 'Vui lòng đăng nhập bằng tài khoản admin để tiếp tục.'}
+            </p>
+          </div>
+        );
+      case 'admin-instructions':
+        return isAdmin ? (
+          <AdminInstructionManagement />
+        ) : (
+          <div className="py-5 text-center">
+            <h5 className="fw-bold mb-2">{t('adminNotAuthorized') || 'Bạn không có quyền truy cập'}</h5>
+            <p className="text-muted mb-0">
+              {t('adminLoginAsPrivileged') || 'Vui lòng đăng nhập bằng tài khoản admin để tiếp tục.'}
+            </p>
+          </div>
+        );
+      case 'admin-users':
+        return isAdmin ? (
+          <AdminUserManagement />
+        ) : (
+          <div className="py-5 text-center">
+            <h5 className="fw-bold mb-2">{t('adminNotAuthorized') || 'Bạn không có quyền truy cập'}</h5>
+            <p className="text-muted mb-0">
+              {t('adminLoginAsPrivileged') || 'Vui lòng đăng nhập bằng tài khoản admin để tiếp tục.'}
+            </p>
+          </div>
+        );
+      case 'admin-analytics':
+        return isAdmin ? (
+          <AnalyticsDashboard />
+        ) : (
+          <div className="py-5 text-center">
+            <h5 className="fw-bold mb-2">{t('adminNotAuthorized') || 'Bạn không có quyền truy cập'}</h5>
+            <p className="text-muted mb-0">
+              {t('adminLoginAsPrivileged') || 'Vui lòng đăng nhập bằng tài khoản admin để tiếp tục.'}
+            </p>
+          </div>
+        );
       default:
         return null;
     }
@@ -242,7 +311,6 @@ const MainLayout = ({ onNavigate, initialTab = 'upload', onTabChange }) => {
                 loading={recognition.loading}
                 error={recognition.error}
                 dishData={recognition.dishData}
-                onSaveToHistory={handleSaveToHistory}
                 onLoginRequest={handleLoginRequest}
                 onToggleFavorite={async (dishId, dishName, currentIsFavorite, onStateChange) => {
                   if (!isLoggedIn) {

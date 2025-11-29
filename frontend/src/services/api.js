@@ -30,7 +30,8 @@ export const recognitionApi = {
   predict: (imageBlob, language) => {
     const formData = new FormData();
     formData.append('file', imageBlob, "capture.jpg");
-    return axios.post(`${API_URL}/predict?language=${language}`, formData, {
+    // Sử dụng createApiInstance() để gửi authorization header
+    return createApiInstance().post(`/predict?language=${language}`, formData, {
       headers: { 'Content-Type': 'multipart/form-data' },
     });
   },
@@ -109,6 +110,76 @@ export const shoppingListApi = {
   
   deleteList: (listId) =>
     createApiInstance().delete(`/shopping-lists/${listId}`)
+};
+
+export const adminDishesApi = {
+  getAll: (search) =>
+    createApiInstance().get('/admin/dishes', {
+      params: search ? { search } : {}
+    }),
+  getDetail: (dishId) =>
+    createApiInstance().get(`/admin/dishes/${dishId}`),
+  updateBaseInfo: (dishId, payload) =>
+    createApiInstance().put(`/admin/dishes/${dishId}`, payload),
+  updateTranslation: (dishId, language, payload) =>
+    createApiInstance().put(`/admin/dishes/${dishId}/translations/${language}`, payload),
+  getDishIngredients: (dishId) =>
+    createApiInstance().get(`/admin/dishes/${dishId}/ingredients`),
+  addDishIngredient: (dishId, payload) =>
+    createApiInstance().post(`/admin/dishes/${dishId}/ingredients`, payload),
+  updateDishIngredient: (dishId, ingredientId, payload) =>
+    createApiInstance().put(`/admin/dishes/${dishId}/ingredients/${ingredientId}`, payload),
+  deleteDishIngredient: (dishId, ingredientId) =>
+    createApiInstance().delete(`/admin/dishes/${dishId}/ingredients/${ingredientId}`),
+  getInstructions: (dishId) =>
+    createApiInstance().get(`/admin/dishes/${dishId}/instructions`),
+  createInstruction: (dishId, payload) =>
+    createApiInstance().post(`/admin/dishes/${dishId}/instructions`, payload),
+  updateInstruction: (dishId, instructionId, payload) =>
+    createApiInstance().put(`/admin/dishes/${dishId}/instructions/${instructionId}`, payload),
+  deleteInstruction: (dishId, instructionId) =>
+    createApiInstance().delete(`/admin/dishes/${dishId}/instructions/${instructionId}`),
+  updateInstructionTranslation: (dishId, instructionId, language, payload) =>
+    createApiInstance().put(`/admin/dishes/${dishId}/instructions/${instructionId}/translations/${language}`, payload),
+  reorderInstructions: (dishId, payload) =>
+    createApiInstance().put(`/admin/dishes/${dishId}/instructions/reorder`, payload)
+};
+
+export const adminIngredientsApi = {
+  list: (search) =>
+    createApiInstance().get('/admin/ingredients', {
+      params: search ? { search } : {}
+    }),
+  create: (payload) =>
+    createApiInstance().post('/admin/ingredients', payload),
+  update: (ingredientId, payload) =>
+    createApiInstance().put(`/admin/ingredients/${ingredientId}`, payload),
+  delete: (ingredientId) =>
+    createApiInstance().delete(`/admin/ingredients/${ingredientId}`),
+  updateTranslation: (ingredientId, language, payload) =>
+    createApiInstance().put(`/admin/ingredients/${ingredientId}/translations/${language}`, payload)
+};
+
+export const adminUsersApi = {
+  getAll: (params = {}) =>
+    createApiInstance().get('/admin/users', { params }),
+  updateRole: (userId, role) =>
+    createApiInstance().put(`/admin/users/${userId}/role`, { role }),
+  updateStatus: (userId, isActive) =>
+    createApiInstance().put(`/admin/users/${userId}/status`, { is_active: isActive }),
+  getStats: (userId) =>
+    createApiInstance().get(`/admin/users/${userId}/stats`),
+  getHistory: (userId, language = 'vi') =>
+    createApiInstance().get(`/admin/users/${userId}/history?language=${language}`),
+  getFavorites: (userId, language = 'vi') =>
+    createApiInstance().get(`/admin/users/${userId}/favorites?language=${language}`),
+  getShoppingLists: (userId, language = 'vi') =>
+    createApiInstance().get(`/admin/users/${userId}/shopping-lists?language=${language}`)
+};
+
+export const adminAnalyticsApi = {
+  getOverview: (language = 'vi') =>
+    createApiInstance().get(`/admin/analytics?language=${language}`)
 };
 
 export { API_URL, PI_STREAM_URL };

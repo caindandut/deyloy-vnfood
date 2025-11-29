@@ -4,7 +4,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 
 const Sidebar = ({ activeTab, onTabChange }) => {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, isAdmin } = useAuth();
   const { darkMode, t } = useTheme();
 
   const menuItems = useMemo(() => {
@@ -21,9 +21,19 @@ const Sidebar = ({ activeTab, onTabChange }) => {
         { key: 'shopping', icon: '🛒', label: t('shoppingList') || 'Danh sách mua sắm' }
       );
     }
+
+    if (isAdmin) {
+      items.push(
+        { key: 'admin-dishes', icon: '🛠️', label: t('adminDishes') || 'Quản lý món' },
+        { key: 'admin-ingredients', icon: '🥕', label: t('adminIngredientsTab') || 'Quản lý nguyên liệu' },
+        { key: 'admin-instructions', icon: '📘', label: t('adminInstructionsTab') || 'Quản lý hướng dẫn' },
+        { key: 'admin-users', icon: '👥', label: t('adminUsersTab') || 'Quản lý người dùng' },
+        { key: 'admin-analytics', icon: '📈', label: t('adminAnalyticsTab') || 'Thống kê' }
+      );
+    }
     
     return items;
-  }, [isLoggedIn, t]);
+  }, [isLoggedIn, isAdmin, t]);
 
   return (
     <div
@@ -61,7 +71,7 @@ const Sidebar = ({ activeTab, onTabChange }) => {
                 }`}
               >
                 <span className="sidebar-item-icon" aria-hidden="true">{item.icon}</span>
-                <span className="sidebar-item-label fs-6">{item.label}</span>
+                <span className="sidebar-item-label">{item.label}</span>
               </div>
             );
           })}

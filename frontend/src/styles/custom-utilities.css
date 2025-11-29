@@ -73,6 +73,10 @@
 
 .sidebar-item-label {
   font-weight: 600;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 @media (min-width: 992px) {

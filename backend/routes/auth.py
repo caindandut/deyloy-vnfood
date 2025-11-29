@@ -10,7 +10,9 @@ try:
         verify_password, 
         create_access_token, 
         get_current_user_required,
-        ACCESS_TOKEN_EXPIRE_MINUTES
+        ACCESS_TOKEN_EXPIRE_MINUTES,
+        is_admin_user,
+        get_user_profile
     )
 except ImportError:
     from backend.models import UserCreate, Token
@@ -20,7 +22,9 @@ except ImportError:
         verify_password, 
         create_access_token, 
         get_current_user_required,
-        ACCESS_TOKEN_EXPIRE_MINUTES
+        ACCESS_TOKEN_EXPIRE_MINUTES,
+        is_admin_user,
+        get_user_profile
     )
 from datetime import timedelta
 
@@ -73,6 +77,9 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     if not user_db or not verify_password(form_data.password, user_db['hashed_password']):
         raise HTTPException(status_code=401, detail="Sai tên đăng nhập hoặc mật khẩu")
 
+    if not user_db.get('is_active', True):
+        raise HTTPException(status_code=403, detail="Tài khoản đã bị khóa")
+
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": user_db['username']}, expires_delta=access_token_expires
@@ -82,5 +89,12 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends()):
 
 @router.get("/me")
 async def read_users_me(current_user: str = Depends(get_current_user_required)):
-    return {"username": current_user}
+    profile = get_user_profile(current_user)
+    return {
+        "username": current_user,
+        "is_admin": is_admin_user(current_user),
+        "role": (profile or {}).get("role", "user"),
+        "is_active": (profile or {}).get("is_active", True),
+        "created_at": (profile or {}).get("created_at")
+    }
 

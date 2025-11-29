@@ -48,6 +48,22 @@ const DishDetail = ({ show, dishData, onClose, onOpenVideo }) => {
     checkFavorite();
   }, [show, safeDishData, isLoggedIn]);
 
+  // Cleanup on unmount only (let Bootstrap handle normal modal close)
+  useEffect(() => {
+    return () => {
+      // Only cleanup on unmount if modal was still showing
+      // This handles the case where component unmounts while modal is open
+      if (show) {
+        if (document.body.classList.contains('modal-open')) {
+          document.body.classList.remove('modal-open');
+          document.body.style.paddingRight = '';
+        }
+        const backdrops = document.querySelectorAll('.modal-backdrop');
+        backdrops.forEach(backdrop => backdrop.remove());
+      }
+    };
+  }, [show]);
+
   const handleToggleFavorite = async () => {
     if (!safeDishData?.dish?.id) return;
 
@@ -76,7 +92,16 @@ const DishDetail = ({ show, dishData, onClose, onOpenVideo }) => {
 
   const uniqueInstructions = useMemo(() => {
     if (!safeDishData) return [];
-    return safeDishData.instructions.filter((step, index, self) => index === self.findIndex((s) => s.step_number === step.step_number));
+    const sorted = [...safeDishData.instructions].sort((a, b) => Number(a.step_number) - Number(b.step_number));
+    const seen = new Map();
+    return sorted.filter(step => {
+      const stepNum = Number(step.step_number);
+      if (!seen.has(stepNum)) {
+        seen.set(stepNum, true);
+        return true;
+      }
+      return false;
+    });
   }, [safeDishData]);
 
   if (!safeDishData) return null;

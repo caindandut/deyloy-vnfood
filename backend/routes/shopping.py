@@ -1,5 +1,6 @@
 from fastapi import APIRouter, HTTPException, Depends
 from typing import Optional, List
+from datetime import datetime
 
 try:
     from ..models import ShoppingListCreate, ShoppingListItemCreate, AddDishToShoppingList
@@ -92,8 +93,25 @@ async def get_shopping_lists(
         cursor.execute(query, (user_id,))
         lists = cursor.fetchall()
         
+        # Format datetime with timezone offset for frontend
         for list_item in lists:
             list_id = list_item['id']
+            # Convert datetime to ISO format with timezone offset (Asia/Ho_Chi_Minh = +07:00)
+            if list_item.get('updated_at'):
+                updated_at = list_item['updated_at']
+                if isinstance(updated_at, datetime):
+                    # Convert datetime object to ISO format with timezone
+                    list_item['updated_at'] = updated_at.strftime('%Y-%m-%dT%H:%M:%S') + '+07:00'
+                elif isinstance(updated_at, str) and 'T' not in updated_at:
+                    # MySQL format: "YYYY-MM-DD HH:MM:SS" -> "YYYY-MM-DDTHH:MM:SS+07:00"
+                    list_item['updated_at'] = updated_at.replace(' ', 'T') + '+07:00'
+            if list_item.get('created_at'):
+                created_at = list_item['created_at']
+                if isinstance(created_at, datetime):
+                    list_item['created_at'] = created_at.strftime('%Y-%m-%dT%H:%M:%S') + '+07:00'
+                elif isinstance(created_at, str) and 'T' not in created_at:
+                    list_item['created_at'] = created_at.replace(' ', 'T') + '+07:00'
+            
             items_query = """
                 SELECT sli.id, sli.ingredient_id, sli.ingredient_name, 
                        sli.quantity, sli.is_checked, sli.created_at,
@@ -157,6 +175,20 @@ async def get_shopping_list(
         """
         cursor.execute(query, (language, list_id,))
         items = cursor.fetchall()
+        
+        # Format datetime with timezone offset for frontend
+        if shopping_list.get('updated_at'):
+            updated_at = shopping_list['updated_at']
+            if isinstance(updated_at, datetime):
+                shopping_list['updated_at'] = updated_at.strftime('%Y-%m-%dT%H:%M:%S') + '+07:00'
+            elif isinstance(updated_at, str) and 'T' not in updated_at:
+                shopping_list['updated_at'] = updated_at.replace(' ', 'T') + '+07:00'
+        if shopping_list.get('created_at'):
+            created_at = shopping_list['created_at']
+            if isinstance(created_at, datetime):
+                shopping_list['created_at'] = created_at.strftime('%Y-%m-%dT%H:%M:%S') + '+07:00'
+            elif isinstance(created_at, str) and 'T' not in created_at:
+                shopping_list['created_at'] = created_at.replace(' ', 'T') + '+07:00'
         
         shopping_list['items'] = items
         return shopping_list

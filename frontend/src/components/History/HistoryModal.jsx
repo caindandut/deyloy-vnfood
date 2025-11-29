@@ -17,9 +17,16 @@ const HistoryModal = ({ show, item, onClose, onOpenVideo }) => {
   const ingredients = useMemo(() => (Array.isArray(item?.ingredients) ? item.ingredients : []), [item]);
   const uniqueInstructions = useMemo(() => {
     if (!Array.isArray(item?.instructions)) return [];
-    return item.instructions.filter(
-      (step, index, self) => index === self.findIndex((s) => s.step_number === step.step_number)
-    );
+    const sorted = [...item.instructions].sort((a, b) => Number(a.step_number) - Number(b.step_number));
+    const seen = new Map();
+    return sorted.filter(step => {
+      const stepNum = Number(step.step_number);
+      if (!seen.has(stepNum)) {
+        seen.set(stepNum, true);
+        return true;
+      }
+      return false;
+    });
   }, [item]);
 
   useEffect(() => {

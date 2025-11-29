@@ -174,34 +174,41 @@ const ShoppingListTab = () => {
             const progress = totalItems === 0 ? 0 : Math.round((checkedItems / totalItems) * 100);
             const updatedLabel = list.updated_at
               ? (() => {
-                  // MySQL DATETIME is timezone-naive, typically stored in UTC or server local time
-                  // If the string doesn't have timezone info (no Z or +/-), treat as UTC
+                  // MySQL DATETIME is timezone-naive, stored in server's local time (Asia/Ho_Chi_Minh)
+                  // Parse the string directly without timezone conversion
                   let dateStr = list.updated_at;
+                  
                   // Check if it already has timezone info (Z or timezone offset like +07:00)
                   const hasTimezone = dateStr.includes('Z') || 
                                       /[+-]\d{2}:?\d{2}$/.test(dateStr) ||
                                       /[+-]\d{4}$/.test(dateStr);
+                  
+                  let date;
                   if (!hasTimezone) {
-                    // MySQL format: "YYYY-MM-DD HH:MM:SS" - append Z to treat as UTC
-                    // Replace space with T for ISO format, then add Z
-                    dateStr = dateStr.replace(' ', 'T') + 'Z';
+                    // MySQL format: "YYYY-MM-DD HH:MM:SS" - treat as local time (Asia/Ho_Chi_Minh)
+                    // Replace space with T for ISO format, then add +07:00 for Asia/Ho_Chi_Minh
+                    dateStr = dateStr.replace(' ', 'T') + '+07:00';
+                    date = new Date(dateStr);
+                  } else {
+                    date = new Date(dateStr);
                   }
-                  const date = new Date(dateStr);
-                  // If still invalid, try parsing as-is (might be in local time)
+                  
+                  // If invalid, try parsing as-is
                   if (isNaN(date.getTime())) {
-                    return new Date(list.updated_at).toLocaleString(
-                      language === 'vi' ? 'vi-VN' : 'en-US',
-                      {
-                        day: '2-digit',
-                        month: '2-digit',
-                        year: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit',
-                        timeZone: 'Asia/Ho_Chi_Minh'
-                      }
-                    );
+                    // Fallback: parse as local time string
+                    const parts = list.updated_at.split(' ');
+                    if (parts.length === 2) {
+                      const [datePart, timePart] = parts;
+                      const [year, month, day] = datePart.split('-');
+                      const [hour, minute, second] = timePart.split(':');
+                      date = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), 
+                                     parseInt(hour), parseInt(minute), parseInt(second || 0));
+                    } else {
+                      date = new Date(list.updated_at);
+                    }
                   }
+                  
+                  // Format using local timezone (Asia/Ho_Chi_Minh)
                   return date.toLocaleString(
                     language === 'vi' ? 'vi-VN' : 'en-US',
                     {

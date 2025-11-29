@@ -66,6 +66,17 @@ async def save_history(request: SaveHistoryRequest, current_user: str = Depends(
 
         user_id = user_db['id']
 
+        # Check if already exists (tránh duplicate nếu đã tự động lưu khi nhận diện)
+        cursor.execute(
+            "SELECT id FROM history WHERE user_id = %s AND dish_id = %s ORDER BY recognized_at DESC LIMIT 1",
+            (user_id, request.dish_id)
+        )
+        existing = cursor.fetchone()
+        
+        if existing:
+            # Đã có trong lịch sử rồi (có thể đã tự động lưu khi nhận diện)
+            return {"message": "Món ăn này đã có trong lịch sử", "already_exists": True}
+        
         # Manual ID generation
         cursor.execute("SELECT MAX(id) FROM history")
         row = cursor.fetchone()
@@ -74,7 +85,7 @@ async def save_history(request: SaveHistoryRequest, current_user: str = Depends(
         cursor.execute("INSERT INTO history (id, user_id, dish_id) VALUES (%s, %s, %s)", (next_id, user_id, request.dish_id))
         conn.commit()
 
-        return {"message": "Đã lưu vào lịch sử thành công"}
+        return {"message": "Đã lưu vào lịch sử thành công", "already_exists": False}
     except Exception as e:
         conn.rollback()
         print(f"LỖI: Không thể lưu lịch sử: {e}")
