@@ -9,20 +9,20 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7
 
 DB_CONFIG = {
-    # 'host': os.getenv("DB_HOST", "gateway01.ap-southeast-1.prod.aws.tidbcloud.com"),
-    # 'port': int(os.getenv("DB_PORT", 4000)),
-    # 'user': os.getenv("DB_USER", "VZpmDrzDCBNd3Xq.root"),
-    # 'password': os.getenv("DB_PASSWORD", "n7IoUj1s7rCXfDab"),
-    # 'database': os.getenv("DB_NAME", "vnfood"),
-    # 'ssl_ca': os.path.join(os.path.dirname(os.path.abspath(__file__)), 'isrgrootx1.pem'),
-    # 'ssl_disabled': False
-    'host': os.getenv("DB_HOST", "localhost"),
-    'port': int(os.getenv("DB_PORT", 3306)),
-    'user': os.getenv("DB_USER", "root"),
-    'password': os.getenv("DB_PASSWORD", "Ledangkhanh@2005"),
+    'host': os.getenv("DB_HOST", "gateway01.ap-southeast-1.prod.aws.tidbcloud.com"),
+    'port': int(os.getenv("DB_PORT", 4000)),
+    'user': os.getenv("DB_USER", "VZpmDrzDCBNd3Xq.root"),
+    'password': os.getenv("DB_PASSWORD", "n7IoUj1s7rCXfDab"),
     'database': os.getenv("DB_NAME", "vnfood"),
-    'ssl_ca': None,
-    'ssl_disabled': True
+    'ssl_ca': os.path.join(os.path.dirname(os.path.abspath(__file__)), 'isrgrootx1.pem'),
+    'ssl_disabled': False
+    # 'host': os.getenv("DB_HOST", "localhost"),
+    # 'port': int(os.getenv("DB_PORT", 3306)),
+    # 'user': os.getenv("DB_USER", "root"),
+    # 'password': os.getenv("DB_PASSWORD", "Ledangkhanh@2005"),
+    # 'database': os.getenv("DB_NAME", "vnfood"),
+    # 'ssl_ca': None,
+    # 'ssl_disabled': True
 }
 
 PI_ADDRESS = "192.168.1.5" # 172.20.10.9
